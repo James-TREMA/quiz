@@ -1,0 +1,25 @@
+ion-content {
+    --background: linear-gradient(to bottom, #121212, #1e1e1e); /* Fond sombre */
+  }
+  
+  ion-list {
+    margin: 15px;
+    border-radius: 10px;
+    background: #1c1c1c; /* Couleur de fond des questions */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  }
+  
+  ion-item {
+    margin: 10px 0;
+    padding: 15px;
+    background-color: #252525; /* Fond des items */
+    border: 1px solid #333333; /* Bordures des items */
+    color: #e0e0e0; /* Texte clair */
+    border-radius: 5px;
+  }
+  
+  ion-item p {
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.5;
+  }  
