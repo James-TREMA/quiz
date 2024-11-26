@@ -4,6 +4,13 @@ import { ExploreContainerComponent } from '../explore-container/explore-containe
 import { TriviaService } from '../services/trivia.service';
 import { CommonModule } from '@angular/common';
 
+import { addIcons } from 'ionicons';
+import { pricetagOutline } from 'ionicons/icons';
+
+addIcons({
+  'pricetag-outline': pricetagOutline,
+});
+
 @Component({
   selector: 'app-tab1',
   templateUrl: 'tab1.page.html',
