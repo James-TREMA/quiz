@@ -11,13 +11,14 @@ import {
 } from '@ionic/angular/standalone';
 import { ActivatedRoute } from '@angular/router';
 import { ExploreContainerComponent } from "../explore-container/explore-container.component";
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-tab2',
   templateUrl: 'tab2.page.html',
   styleUrls: ['tab2.page.scss'],
   standalone: true,
-  imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonSpinner, ExploreContainerComponent],
+  imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonSpinner, ExploreContainerComponent, CommonModule],
 })
 export class Tab2Page implements OnInit {
   questions: any[] = [];
