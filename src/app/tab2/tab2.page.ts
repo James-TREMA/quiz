@@ -79,9 +79,9 @@ export class Tab2Page implements OnInit {
       question.selectedAnswer = selectedAnswer; // Enregistre la réponse sélectionnée
       if (selectedAnswer === question.correctAnswer) {
         question.completed = true; // Marque la question comme complétée
-        alert('Bonne réponse !');
+        //alert('Bonne réponse !');
       } else {
-        alert('Mauvaise réponse.');
+        //alert('Mauvaise réponse.');
       }
     }
   }  
