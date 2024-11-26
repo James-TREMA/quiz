@@ -6,6 +6,7 @@ import { CommonModule } from '@angular/common';
 
 import { addIcons } from 'ionicons';
 import { pricetagOutline } from 'ionicons/icons';
+import { Router } from '@angular/router';
 
 addIcons({
   'pricetag-outline': pricetagOutline,
@@ -23,9 +24,9 @@ export class Tab1Page implements OnInit {
   categories: any[] = [];
   isLoading = true;
 
-  constructor(private triviaService: TriviaService) {
-      addIcons({pricetagOutline})
-  ;}
+  constructor(private triviaService: TriviaService, private router: Router) {
+    addIcons({pricetagOutline});
+  }
 
   ngOnInit() {
     this.loadCategories();
@@ -42,5 +43,10 @@ export class Tab1Page implements OnInit {
         this.isLoading = false;
       },
     });
+  }
+
+  // Ajout de la méthode goToQuestions
+  goToQuestions(categoryId: number) {
+    this.router.navigate(['/tabs/tab2'], { queryParams: { categoryId } });
   }
 }

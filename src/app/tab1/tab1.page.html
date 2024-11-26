@@ -15,8 +15,8 @@
     <ion-item *ngFor="let category of categories" (click)="goToQuestions(category.id)">
       <ion-icon name="pricetag-outline" slot="start"></ion-icon>
       {{ category.name }}
-    </ion-item>    
-  </ion-list>
+    </ion-item>
+  </ion-list>  
 
   <ion-spinner *ngIf="isLoading"></ion-spinner>
 </ion-content>
