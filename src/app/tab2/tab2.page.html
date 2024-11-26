@@ -29,7 +29,7 @@
         <ion-button
           *ngFor="let answer of question.allAnswers"
           (click)="selectAnswer(question, answer)"
-          [disabled]="question.completed" <!-- Désactivation si complété -->
+          [disabled]="question.completed"
           expand="block"
           fill="outline"
         >
