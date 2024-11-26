@@ -12,6 +12,13 @@ import {
 import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
+import { addIcons } from 'ionicons';
+import { checkmarkCircleOutline } from 'ionicons/icons';
+
+addIcons({
+  'checkmark-circle-outline': checkmarkCircleOutline,
+});
+
 @Component({
   selector: 'app-tab2',
   templateUrl: 'tab2.page.html',
