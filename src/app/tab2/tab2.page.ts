@@ -57,13 +57,11 @@ export class Tab2Page implements OnInit {
 
   loadQuestions() {
     const cachedQuestions = this.triviaService.getCachedQuestions();
-  
+
     if (cachedQuestions.length > 0 && this.triviaService.getCachedCategoryId() === this.categoryId) {
-      // Utilise les questions en cache si la catégorie est la même
       this.questions = cachedQuestions;
       this.isLoading = false;
     } else {
-      // Charge les questions depuis l'API et les met en cache
       this.triviaService.getQuestions(10, this.categoryId).subscribe({
         next: (data) => {
           this.questions = data.results.map((q: any) => ({
@@ -72,8 +70,8 @@ export class Tab2Page implements OnInit {
             allAnswers: this.shuffleAnswers([q.correct_answer, ...q.incorrect_answers]),
             completed: false,
           }));
-          this.triviaService.setCachedQuestions(this.questions); // Sauvegarde dans le cache
-          this.triviaService.setCachedCategoryId(this.categoryId); // Sauvegarde la catégorie
+          this.triviaService.setCachedQuestions(this.questions);
+          this.triviaService.setCachedCategoryId(this.categoryId);
           this.isLoading = false;
         },
         error: (err) => {
@@ -83,23 +81,21 @@ export class Tab2Page implements OnInit {
       });
     }
   }
-  
+
   shuffleAnswers(answers: string[]): string[] {
     return answers.sort(() => Math.random() - 0.5);
   }
 
   selectAnswer(question: any, selectedAnswer: string) {
     if (!question.completed) {
+      question.completed = true; // Marquer la question comme complétée
       question.selectedAnswer = selectedAnswer;
-      question.completed = true;
-  
+
       if (selectedAnswer === question.correctAnswer) {
-        // alert('Bonne réponse !');
         this.triviaService.incrementScores(true); // Bonne réponse
       } else {
-        // alert('Mauvaise réponse.');
         this.triviaService.incrementScores(false); // Mauvaise réponse
       }
     }
-  }  
+  }
 }
