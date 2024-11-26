@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, catchError, throwError } from 'rxjs';
+import { Observable, catchError, tap, throwError } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -29,8 +29,9 @@ export class TriviaService {
     let params = `amount=${amount}`;
     if (category) params += `&category=${category}`;
     if (difficulty) params += `&difficulty=${difficulty}`;
-
+  
     return this.http.get(`${this.apiUrl}?${params}`).pipe(
+      tap((response) => console.log('Données API reçues :', response)),
       catchError((error) => {
         console.error('Erreur lors de la récupération des questions', error);
         return throwError(() => new Error('Erreur de chargement des questions'));
