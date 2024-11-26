@@ -8,8 +8,7 @@ import {
   IonList,
   IonItem,
   IonSpinner,
-  IonButton,
-} from '@ionic/angular/standalone';
+  IonButton, IonIcon } from '@ionic/angular/standalone';
 import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
@@ -18,7 +17,7 @@ import { CommonModule } from '@angular/common';
   templateUrl: 'tab2.page.html',
   styleUrls: ['tab2.page.scss'],
   standalone: true,
-  imports: [
+  imports: [IonIcon, 
     IonHeader,
     IonToolbar,
     IonTitle,
@@ -53,6 +52,7 @@ export class Tab2Page implements OnInit {
           question: q.question,
           correctAnswer: q.correct_answer,
           allAnswers: this.shuffleAnswers([q.correct_answer, ...q.incorrect_answers]),
+          completed: false, // Ajout de l'état complété
         }));
         this.isLoading = false;
       },
@@ -61,17 +61,21 @@ export class Tab2Page implements OnInit {
         this.isLoading = false;
       },
     });
-  }
+  }  
 
   shuffleAnswers(answers: string[]): string[] {
     return answers.sort(() => Math.random() - 0.5);
   }
 
   selectAnswer(question: any, selectedAnswer: string) {
-    if (selectedAnswer === question.correctAnswer) {
-      alert('Bonne réponse !');
-    } else {
-      alert('Mauvaise réponse.');
+    if (!question.completed) { // Vérifie si la question n'est pas déjà complétée
+      question.selectedAnswer = selectedAnswer; // Enregistre la réponse sélectionnée
+      if (selectedAnswer === question.correctAnswer) {
+        question.completed = true; // Marque la question comme complétée
+        alert('Bonne réponse !');
+      } else {
+        alert('Mauvaise réponse.');
+      }
     }
   }  
 }

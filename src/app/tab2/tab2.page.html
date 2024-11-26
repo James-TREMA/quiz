@@ -15,11 +15,21 @@
   <ion-list *ngIf="!isLoading">
     <ion-item *ngFor="let question of questions">
       <p [innerHTML]="question.question"></p>
-
+  
+      <!-- Icône pour les questions complétées -->
+      <ion-icon
+        *ngIf="question.completed"
+        name="checkmark-circle-outline"
+        slot="end"
+        color="success"
+      ></ion-icon>
+  
+      <!-- Réponses -->
       <div class="answers">
         <ion-button
           *ngFor="let answer of question.allAnswers"
           (click)="selectAnswer(question, answer)"
+          [disabled]="question.completed" <!-- Désactivation si complété -->
           expand="block"
           fill="outline"
         >

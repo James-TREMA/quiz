@@ -16,6 +16,7 @@ ion-content {
     color: #e0e0e0;
     border-radius: 5px;
     border: 1px solid #333333;
+    position: relative;
   }
   
   .answers {
@@ -31,7 +32,13 @@ ion-content {
     color: white;
   }
   
-  ion-button:hover {
-    background-color: #388e3c;
+  ion-button:disabled {
+    background-color: #808080; /* Boutons désactivés en gris */
+    color: #ccc;
+  }
+  
+  ion-icon {
+    font-size: 24px;
+    color: #4caf50;
   }
   
