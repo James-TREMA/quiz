@@ -1,13 +1,5 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>
-      Tab 2
-    </ion-title>
-  </ion-toolbar>
-</ion-header>
-
-<ion-header [translucent]="true">
-  <ion-toolbar>
     <ion-title>Questions</ion-title>
   </ion-toolbar>
 </ion-header>
@@ -23,11 +15,20 @@
   <ion-list *ngIf="!isLoading">
     <ion-item *ngFor="let question of questions">
       <p [innerHTML]="question.question"></p>
+
+      <div class="answers">
+        <ion-button
+          *ngFor="let answer of question.allAnswers"
+          (click)="selectAnswer(question, answer)"
+          expand="block"
+          fill="outline"
+        >
+          {{ answer }}
+        </ion-button>
+      </div>
     </ion-item>
   </ion-list>
 
   <!-- Spinner de chargement -->
   <ion-spinner *ngIf="isLoading"></ion-spinner>
-
-  <!-- <app-explore-container name="Tab 2 page"></app-explore-container> -->
 </ion-content>

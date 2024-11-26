@@ -1,25 +1,37 @@
 ion-content {
-    --background: linear-gradient(to bottom, #121212, #1e1e1e); /* Fond sombre */
+    --background: linear-gradient(to bottom, #121212, #1e1e1e);
   }
   
   ion-list {
     margin: 15px;
+    background: #1c1c1c;
     border-radius: 10px;
-    background: #1c1c1c; /* Couleur de fond des questions */
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
   }
   
   ion-item {
     margin: 10px 0;
     padding: 15px;
-    background-color: #252525; /* Fond des items */
-    border: 1px solid #333333; /* Bordures des items */
-    color: #e0e0e0; /* Texte clair */
+    background-color: #252525;
+    color: #e0e0e0;
     border-radius: 5px;
+    border: 1px solid #333333;
   }
   
-  ion-item p {
-    margin: 0;
-    font-size: 16px;
-    line-height: 1.5;
-  }  
+  .answers {
+    margin-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  
+  ion-button {
+    flex: 1 1 calc(50% - 10px);
+    background-color: #4caf50;
+    color: white;
+  }
+  
+  ion-button:hover {
+    background-color: #388e3c;
+  }
+  
