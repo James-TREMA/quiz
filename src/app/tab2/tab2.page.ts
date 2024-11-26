@@ -91,12 +91,15 @@ export class Tab2Page implements OnInit {
   selectAnswer(question: any, selectedAnswer: string) {
     if (!question.completed) {
       question.selectedAnswer = selectedAnswer;
+      question.completed = true;
+  
       if (selectedAnswer === question.correctAnswer) {
-        question.completed = true;
         // alert('Bonne réponse !');
+        this.triviaService.incrementScores(true); // Bonne réponse
       } else {
         // alert('Mauvaise réponse.');
+        this.triviaService.incrementScores(false); // Mauvaise réponse
       }
     }
-  }
+  }  
 }

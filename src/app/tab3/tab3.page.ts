@@ -21,12 +21,16 @@ export class Tab3Page implements OnInit {
   constructor(private triviaService: TriviaService) {}
 
   ngOnInit() {
-    // Récupérer les scores depuis TriviaService
+    this.updateScores();
+  }
+  
+  updateScores() {
     const scores = this.triviaService.getScores();
     this.totalAnswers = scores.totalAnswers;
     this.correctAnswers = scores.correctAnswers;
     this.incorrectAnswers = scores.incorrectAnswers;
   }
+  
 
   // Méthode pour charger une image de profil
   onProfileImageChange(event: any) {

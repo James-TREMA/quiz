@@ -76,4 +76,15 @@ export class TriviaService {
   clearScores(): void {
     localStorage.removeItem(this.scoresKey);
   }
+
+  incrementScores(isCorrect: boolean): void {
+    const scores = this.getScores();
+    scores.totalAnswers += 1;
+    if (isCorrect) {
+      scores.correctAnswers += 1;
+    } else {
+      scores.incorrectAnswers += 1;
+    }
+    this.setScores(scores.totalAnswers, scores.correctAnswers, scores.incorrectAnswers);
+  }  
 }
