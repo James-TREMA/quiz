@@ -8,6 +8,7 @@ import { Observable, catchError, throwError } from 'rxjs';
 export class TriviaService {
   private apiUrl = 'https://opentdb.com/api.php';
   private cachedQuestions: any[] = [];
+  private cachedCategoryId: number | null = null;
 
   constructor(private http: HttpClient) {}
 
@@ -48,5 +49,13 @@ export class TriviaService {
 
   clearCachedQuestions(): void {
     this.cachedQuestions = [];
+  }
+
+  getCachedCategoryId(): number | null {
+    return this.cachedCategoryId;
+  }
+  
+  setCachedCategoryId(categoryId: number): void {
+    this.cachedCategoryId = categoryId;
   }
 }

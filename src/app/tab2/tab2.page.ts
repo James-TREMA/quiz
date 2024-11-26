@@ -57,9 +57,9 @@ export class Tab2Page implements OnInit {
 
   loadQuestions() {
     const cachedQuestions = this.triviaService.getCachedQuestions();
-
-    if (cachedQuestions.length > 0) {
-      // Utilise les questions en cache
+  
+    if (cachedQuestions.length > 0 && this.triviaService.getCachedCategoryId() === this.categoryId) {
+      // Utilise les questions en cache si la catégorie est la même
       this.questions = cachedQuestions;
       this.isLoading = false;
     } else {
@@ -73,6 +73,7 @@ export class Tab2Page implements OnInit {
             completed: false,
           }));
           this.triviaService.setCachedQuestions(this.questions); // Sauvegarde dans le cache
+          this.triviaService.setCachedCategoryId(this.categoryId); // Sauvegarde la catégorie
           this.isLoading = false;
         },
         error: (err) => {
@@ -82,7 +83,7 @@ export class Tab2Page implements OnInit {
       });
     }
   }
-
+  
   shuffleAnswers(answers: string[]): string[] {
     return answers.sort(() => Math.random() - 0.5);
   }

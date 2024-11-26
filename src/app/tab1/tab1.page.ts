@@ -47,7 +47,6 @@ export class Tab1Page implements OnInit {
 
   // Appelé lors du clic sur un thème
   goToQuestions(categoryId: number) {
-    this.triviaService.clearCachedQuestions(); // Efface les questions existantes
     this.router.navigate(['/tabs/tab2'], { queryParams: { categoryId } });
   }
 }
