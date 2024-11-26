@@ -6,6 +6,9 @@ import { Observable, catchError, tap, throwError } from 'rxjs';
   providedIn: 'root',
 })
 export class TriviaService {
+  shuffleAnswers(arg0: string[]) {
+    throw new Error('Method not implemented.');
+  }
   private apiUrl = 'https://opentdb.com/api.php';
   private cachedQuestions: any[] = [];
   private cachedCategoryId: number | null = null;
