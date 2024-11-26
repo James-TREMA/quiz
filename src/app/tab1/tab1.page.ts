@@ -23,7 +23,8 @@ export class Tab1Page implements OnInit {
   categories: any[] = [];
   isLoading = true;
 
-  constructor(private triviaService: TriviaService) {}
+  constructor(private triviaService: TriviaService) {
+      addIcons({pricetagOutline});}
 
   ngOnInit() {
     this.loadCategories();

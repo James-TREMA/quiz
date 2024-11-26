@@ -1,19 +1,21 @@
 ion-content {
-    --background: linear-gradient(to bottom, #ffffff, #f0f0f0); /* Dégradé pour le fond */
+    --background: linear-gradient(to bottom, #121212, #1e1e1e); /* Dégradé sombre */
   }
   
   ion-list {
     margin: 15px;
     border-radius: 10px;
-    background: #ffffff;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    background: #1c1c1c; /* Couleur de fond sombre */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
     overflow: hidden;
   }
   
   ion-item {
     margin: 0;
     padding: 15px;
-    border-bottom: 1px solid #e0e0e0;
+    background-color: #252525; /* Fond des éléments */
+    border-bottom: 1px solid #333333; /* Bordures */
+    color: #e0e0e0; /* Texte clair */
     transition: all 0.3s ease;
   }
   
@@ -22,24 +24,24 @@ ion-content {
   }
   
   ion-item:hover {
-    background-color: #4caf50; /* Couleur de survol */
-    color: white; /* Texte en blanc au survol */
+    background-color: #e0e0e024; /* Couleur de survol */
     transform: scale(1.02); /* Effet de zoom */
   }
   
   ion-icon {
     margin-right: 10px;
-    color: #4caf50; /* Couleur de l'icône */
+    color: #4caf50; /* Couleur des icônes */
   }
   
   ion-title {
     font-size: 24px;
     font-weight: bold;
-    color: #333; /* Titre moderne */
+    color: #4caf50; /* Titre clair */
   }
   
   ion-spinner {
     display: block;
     margin: 20px auto;
-    color: #4caf50; /* Couleur personnalisée */
-  }  
+    color: #4caf50; /* Spinner clair */
+  }
+  
