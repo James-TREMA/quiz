@@ -9,6 +9,7 @@ export class TriviaService {
   private apiUrl = 'https://opentdb.com/api.php';
   private cachedQuestions: any[] = [];
   private cachedCategoryId: number | null = null;
+  private scoresKey = 'triviaScores'; // Clé pour le stockage local des scores
 
   constructor(private http: HttpClient) {}
 
@@ -37,12 +38,11 @@ export class TriviaService {
     );
   }
 
-  // Méthode pour récupérer les questions
+  // Gérer le cache des questions
   getCachedQuestions(): any[] {
     return this.cachedQuestions;
   }
 
-  // Méthode pour stocker les questions dans le cache
   setCachedQuestions(questions: any[]): void {
     this.cachedQuestions = questions;
   }
@@ -54,8 +54,26 @@ export class TriviaService {
   getCachedCategoryId(): number | null {
     return this.cachedCategoryId;
   }
-  
+
   setCachedCategoryId(categoryId: number): void {
     this.cachedCategoryId = categoryId;
+  }
+
+  // Gestion des scores
+  getScores(): { totalAnswers: number; correctAnswers: number; incorrectAnswers: number } {
+    const scores = localStorage.getItem(this.scoresKey);
+    if (scores) {
+      return JSON.parse(scores);
+    }
+    return { totalAnswers: 0, correctAnswers: 0, incorrectAnswers: 0 };
+  }
+
+  setScores(totalAnswers: number, correctAnswers: number, incorrectAnswers: number): void {
+    const scores = { totalAnswers, correctAnswers, incorrectAnswers };
+    localStorage.setItem(this.scoresKey, JSON.stringify(scores));
+  }
+
+  clearScores(): void {
+    localStorage.removeItem(this.scoresKey);
   }
 }
