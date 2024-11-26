@@ -7,6 +7,7 @@ import { Observable, catchError, throwError } from 'rxjs';
 })
 export class TriviaService {
   private apiUrl = 'https://opentdb.com/api.php';
+  private cachedQuestions: any[] = [];
 
   constructor(private http: HttpClient) {}
 
@@ -33,5 +34,19 @@ export class TriviaService {
         return throwError(() => new Error('Erreur de chargement des questions'));
       })
     );
+  }
+
+  // Méthode pour récupérer les questions
+  getCachedQuestions(): any[] {
+    return this.cachedQuestions;
+  }
+
+  // Méthode pour stocker les questions dans le cache
+  setCachedQuestions(questions: any[]): void {
+    this.cachedQuestions = questions;
+  }
+
+  clearCachedQuestions(): void {
+    this.cachedQuestions = [];
   }
 }
