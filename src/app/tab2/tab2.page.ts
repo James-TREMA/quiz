@@ -90,14 +90,13 @@ export class Tab2Page implements OnInit {
       cachedQuestions.length > 0 &&
       this.triviaService.getCachedCategoryId() === this.categoryId
     ) {
-      this.questions = cachedQuestions;
+      this.questions = cachedQuestions; // Restaurer les questions depuis le service
       this.isLoading = false;
     } else {
       this.loadQuestions();
     }
-    console.log('Scores actuels :', this.triviaService.getScores());
   }
-
+  
   loadQuestions(): void {
     this.isLoading = true;
 
