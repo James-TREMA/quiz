@@ -85,17 +85,22 @@ export class Tab2Page implements OnInit {
     this.triviaService.getQuestionsWithDelay(10, this.categoryId).then((observable) => {
       observable.subscribe({
         next: (data: { results: any[] }) => {
-          this.questions = data.results.map((q) => ({
-            question: decode(q.question),
-            correctAnswer: decode(q.correct_answer),
-            allAnswers: this.shuffleAnswers([
-              decode(q.correct_answer),
-              ...q.incorrect_answers.map((ans: string) => decode(ans)),
-            ]),
-            completed: false,
-          }));
-          this.triviaService.setCachedQuestions(this.questions);
-          this.triviaService.setCachedCategoryId(this.categoryId);
+          if (data && Array.isArray(data.results) && data.results.length > 0) {
+            this.questions = data.results.map((q) => ({
+              question: decode(q.question),
+              correctAnswer: decode(q.correct_answer),
+              allAnswers: this.shuffleAnswers([
+                decode(q.correct_answer),
+                ...q.incorrect_answers.map((ans: string) => decode(ans)),
+              ]),
+              completed: false,
+            }));
+            this.triviaService.setCachedQuestions(this.questions);
+            this.triviaService.setCachedCategoryId(this.categoryId);
+          } else {
+            console.error('Aucune question valide retournée par l\'API.');
+            alert('Aucune question disponible pour cette catégorie. Veuillez réessayer plus tard.');
+          }
           this.isLoading = false;
         },
         error: (err) => {
@@ -107,8 +112,8 @@ export class Tab2Page implements OnInit {
         },
       });
     });
-  }    
-
+  }
+  
   selectAnswer(question: any, selectedAnswer: string): void {
     if (!question.completed) {
       question.completed = true;
