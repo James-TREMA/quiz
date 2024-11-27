@@ -16,34 +16,43 @@ export class TriviaService {
   constructor(private http: HttpClient) {}
 
   /**
-   * Récupère des questions depuis l'API ou le cache.
-   * @param amount Le nombre de questions à récupérer
-   * @param categoryId L'ID de la catégorie (facultatif)
-   * @returns Un Observable contenant les questions
+   * Récupère les catégories de l'API
+   * @returns Observable avec les catégories
+   */
+  getCategories(): Observable<{ trivia_categories: { id: number; name: string }[] }> {
+    const url = 'https://opentdb.com/api_category.php';
+    return this.http.get<{ trivia_categories: { id: number; name: string }[] }>(url).pipe(
+      catchError((error) => {
+        console.error('Erreur lors de la récupération des catégories', error);
+        return throwError(() => new Error('Erreur de chargement des catégories'));
+      })
+    );
+  }
+
+  /**
+   * Récupère des questions depuis l'API ou le cache
+   * @param amount Nombre de questions à récupérer
+   * @param categoryId ID de la catégorie
+   * @returns Observable avec les questions
    */
   getQuestions(amount: number, categoryId?: number): Observable<any> {
-    // Si le cache correspond à la catégorie demandée, on retourne le cache
     if (this.cachedQuestions.length > 0 && this.cachedCategoryId === categoryId) {
       return of({ results: this.cachedQuestions });
     }
 
-    // Construction des paramètres de requête
     const params = new URLSearchParams({ amount: `${amount}` });
     if (categoryId) params.append('category', `${categoryId}`);
 
     const url = `${this.apiUrl}?${params.toString()}`;
-    
-    // Appel HTTP pour récupérer les questions
+
     return this.http.get<any>(url).pipe(
       tap((response) => {
-        // Décodage des questions et réponses pour éviter les entités HTML
         response.results = response.results.map((q: any) => ({
           ...q,
           question: decode(q.question),
           correct_answer: decode(q.correct_answer),
           incorrect_answers: q.incorrect_answers.map((ans: string) => decode(ans)),
         }));
-        // Mise en cache des questions
         this.cachedQuestions = response.results;
         this.cachedCategoryId = categoryId;
       }),
@@ -54,26 +63,27 @@ export class TriviaService {
     );
   }
 
-  /**
-   * Retourne les questions en cache.
-   * @returns Les questions en cache
-   */
   getCachedQuestions(): any[] {
     return this.cachedQuestions;
   }
 
-  /**
-   * Vide le cache des questions.
-   */
+  setCachedQuestions(questions: any[]): void {
+    this.cachedQuestions = questions;
+  }
+
+  getCachedCategoryId(): number | null | undefined {
+    return this.cachedCategoryId;
+  }
+
+  setCachedCategoryId(categoryId: number): void {
+    this.cachedCategoryId = categoryId;
+  }
+
   clearCache(): void {
     this.cachedQuestions = [];
     this.cachedCategoryId = null;
   }
 
-  /**
-   * Récupère les scores depuis le stockage local.
-   * @returns Les scores (total, corrects, incorrects)
-   */
   getScores(): { totalAnswers: number; correctAnswers: number; incorrectAnswers: number } {
     const scores = localStorage.getItem(this.scoresKey);
     if (scores) {
@@ -82,28 +92,15 @@ export class TriviaService {
     return { totalAnswers: 0, correctAnswers: 0, incorrectAnswers: 0 };
   }
 
-  /**
-   * Met à jour les scores dans le stockage local.
-   * @param totalAnswers Nombre total de réponses
-   * @param correctAnswers Nombre de réponses correctes
-   * @param incorrectAnswers Nombre de réponses incorrectes
-   */
   setScores(totalAnswers: number, correctAnswers: number, incorrectAnswers: number): void {
     const scores = { totalAnswers, correctAnswers, incorrectAnswers };
     localStorage.setItem(this.scoresKey, JSON.stringify(scores));
   }
 
-  /**
-   * Réinitialise les scores.
-   */
   clearScores(): void {
     localStorage.removeItem(this.scoresKey);
   }
 
-  /**
-   * Incrémente les scores en fonction de la validité de la réponse.
-   * @param isCorrect Indique si la réponse est correcte
-   */
   incrementScores(isCorrect: boolean): void {
     const scores = this.getScores();
     scores.totalAnswers++;
