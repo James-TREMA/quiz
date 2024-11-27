@@ -38,14 +38,19 @@ export class TriviaService {
   
     return this.http.get<any>(url).pipe(
       tap((response) => {
-        response.results = response.results.map((q: any) => ({
-          ...q,
-          question: decode(q.question),
-          correct_answer: decode(q.correct_answer),
-          incorrect_answers: q.incorrect_answers.map((ans: string) => decode(ans)),
-        }));
-        this.cachedQuestions = response.results;
-        this.cachedCategoryId = categoryId;
+        if (response && Array.isArray(response.results)) {
+          response.results = response.results.map((q: any) => ({
+            ...q,
+            question: decode(q.question),
+            correct_answer: decode(q.correct_answer),
+            incorrect_answers: q.incorrect_answers.map((ans: string) => decode(ans)),
+          }));
+          this.cachedQuestions = response.results;
+          this.cachedCategoryId = categoryId;
+        } else {
+          console.error('Les résultats retournés par l\'API ne sont pas valides.', response);
+          throw new Error('Résultats invalides retournés par l\'API.');
+        }
       }),
       catchError((error) => {
         if (error.status === 429) {
@@ -57,7 +62,7 @@ export class TriviaService {
       })
     );
   }
-  
+    
   async getQuestionsWithDelay(amount: number, categoryId?: number): Promise<Observable<any>> {
     await this.delay(1000); // Pause de 1 seconde entre les appels
     return this.getQuestions(amount, categoryId);
