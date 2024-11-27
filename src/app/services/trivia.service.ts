@@ -1,49 +1,51 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, catchError, tap, throwError } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
+import { catchError, tap } from 'rxjs/operators';
 import { decode } from 'html-entities';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TriviaService {
-  shuffleAnswers(arg0: string[]) {
-    throw new Error('Method not implemented.');
-  }
-  private apiUrl = 'https://opentdb.com/api.php';
-  private cachedQuestions: any[] = [];
-  private cachedCategoryId: number | null = null;
-  private scoresKey = 'triviaScores'; // Clé pour le stockage local des scores
+  private readonly apiUrl = 'https://opentdb.com/api.php'; // URL de l'API
+  private cachedQuestions: any[] = []; // Cache des questions
+  private cachedCategoryId: number | null | undefined = null; // Cache de la catégorie actuelle
+  private readonly scoresKey = 'triviaScores'; // Clé pour le stockage local des scores
 
   constructor(private http: HttpClient) {}
 
-  // Récupérer les catégories disponibles
-  getCategories(): Observable<any> {
-    const url = 'https://opentdb.com/api_category.php';
-    return this.http.get(url).pipe(
-      catchError((error) => {
-        console.error('Erreur lors de la récupération des catégories', error);
-        return throwError(() => new Error('Erreur de chargement des catégories'));
-      })
-    );
-  }
+  /**
+   * Récupère des questions depuis l'API ou le cache.
+   * @param amount Le nombre de questions à récupérer
+   * @param categoryId L'ID de la catégorie (facultatif)
+   * @returns Un Observable contenant les questions
+   */
+  getQuestions(amount: number, categoryId?: number): Observable<any> {
+    // Si le cache correspond à la catégorie demandée, on retourne le cache
+    if (this.cachedQuestions.length > 0 && this.cachedCategoryId === categoryId) {
+      return of({ results: this.cachedQuestions });
+    }
 
-  // Récupérer des questions selon les paramètres
-  getQuestions(amount: number, category?: number, difficulty?: string): Observable<any> {
-    let params = `amount=${amount}`;
-    if (category) params += `&category=${category}`;
-    if (difficulty) params += `&difficulty=${difficulty}`;
-  
-    return this.http.get(`${this.apiUrl}?${params}`).pipe(
-      tap((response: any) => {
-        // Décoder toutes les réponses pour éviter les problèmes de comparaison
+    // Construction des paramètres de requête
+    const params = new URLSearchParams({ amount: `${amount}` });
+    if (categoryId) params.append('category', `${categoryId}`);
+
+    const url = `${this.apiUrl}?${params.toString()}`;
+    
+    // Appel HTTP pour récupérer les questions
+    return this.http.get<any>(url).pipe(
+      tap((response) => {
+        // Décodage des questions et réponses pour éviter les entités HTML
         response.results = response.results.map((q: any) => ({
           ...q,
           question: decode(q.question),
           correct_answer: decode(q.correct_answer),
           incorrect_answers: q.incorrect_answers.map((ans: string) => decode(ans)),
         }));
-        console.log('Données API décodées :', response);
+        // Mise en cache des questions
+        this.cachedQuestions = response.results;
+        this.cachedCategoryId = categoryId;
       }),
       catchError((error) => {
         console.error('Erreur lors de la récupération des questions', error);
@@ -52,28 +54,26 @@ export class TriviaService {
     );
   }
 
-  // Gérer le cache des questions
+  /**
+   * Retourne les questions en cache.
+   * @returns Les questions en cache
+   */
   getCachedQuestions(): any[] {
     return this.cachedQuestions;
   }
 
-  setCachedQuestions(questions: any[]): void {
-    this.cachedQuestions = questions;
-  }
-
-  clearCachedQuestions(): void {
+  /**
+   * Vide le cache des questions.
+   */
+  clearCache(): void {
     this.cachedQuestions = [];
+    this.cachedCategoryId = null;
   }
 
-  getCachedCategoryId(): number | null {
-    return this.cachedCategoryId;
-  }
-
-  setCachedCategoryId(categoryId: number): void {
-    this.cachedCategoryId = categoryId;
-  }
-
-  // Gestion des scores
+  /**
+   * Récupère les scores depuis le stockage local.
+   * @returns Les scores (total, corrects, incorrects)
+   */
   getScores(): { totalAnswers: number; correctAnswers: number; incorrectAnswers: number } {
     const scores = localStorage.getItem(this.scoresKey);
     if (scores) {
@@ -82,23 +82,36 @@ export class TriviaService {
     return { totalAnswers: 0, correctAnswers: 0, incorrectAnswers: 0 };
   }
 
+  /**
+   * Met à jour les scores dans le stockage local.
+   * @param totalAnswers Nombre total de réponses
+   * @param correctAnswers Nombre de réponses correctes
+   * @param incorrectAnswers Nombre de réponses incorrectes
+   */
   setScores(totalAnswers: number, correctAnswers: number, incorrectAnswers: number): void {
     const scores = { totalAnswers, correctAnswers, incorrectAnswers };
     localStorage.setItem(this.scoresKey, JSON.stringify(scores));
   }
 
+  /**
+   * Réinitialise les scores.
+   */
   clearScores(): void {
     localStorage.removeItem(this.scoresKey);
   }
 
+  /**
+   * Incrémente les scores en fonction de la validité de la réponse.
+   * @param isCorrect Indique si la réponse est correcte
+   */
   incrementScores(isCorrect: boolean): void {
     const scores = this.getScores();
-    scores.totalAnswers += 1;
+    scores.totalAnswers++;
     if (isCorrect) {
-      scores.correctAnswers += 1;
+      scores.correctAnswers++;
     } else {
-      scores.incorrectAnswers += 1;
+      scores.incorrectAnswers++;
     }
     this.setScores(scores.totalAnswers, scores.correctAnswers, scores.incorrectAnswers);
-  }  
+  }
 }
