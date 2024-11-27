@@ -2,7 +2,6 @@ ion-content {
   --background: linear-gradient(to bottom, #121212, #1e1e1e);
 }
 
-/* Conteneur centré */
 .quiz-container {
   display: flex;
   justify-content: center;
@@ -11,7 +10,6 @@ ion-content {
   padding: 20px;
 }
 
-/* Carte du quiz */
 .quiz-card {
   width: 100%;
   max-width: 500px;
@@ -24,7 +22,6 @@ ion-content {
   gap: 20px;
 }
 
-/* Texte de la question */
 .question {
   font-size: 20px;
   font-weight: bold;
@@ -33,7 +30,6 @@ ion-content {
   line-height: 1.5;
 }
 
-/* Boutons de réponse */
 .answers {
   display: flex;
   flex-direction: column;
@@ -52,32 +48,27 @@ ion-button {
   transition: transform 0.3s, box-shadow 0.3s, background-color 0.3s;
 }
 
-/* Effet au survol */
 ion-button:hover {
   transform: scale(1.05);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
 }
 
-/* Boutons désactivés */
 ion-button:disabled {
   background-color: #808080;
   color: #ccc;
   box-shadow: none;
 }
 
-/* Bouton sélectionné */
 .selected-answer {
   border: 2px solid #4caf50;
 }
 
-/* Bouton pour une bonne réponse */
 .correct-answer {
   border: 2px solid #4caf50;
   background-color: #1d3f1d !important;
   color: #4caf50;
 }
 
-/* Bouton pour une mauvaise réponse */
 .incorrect-answer {
   border: 2px solid #ff5252;
   background-color: #3f1d1d !important;

@@ -11,7 +11,10 @@ import {
   IonItem,
   IonSpinner,
   IonButton,
-  IonIcon, IonCard, IonCardContent } from '@ionic/angular/standalone';
+  IonIcon,
+  IonCard,
+  IonCardContent,
+} from '@ionic/angular/standalone';
 import { CommonModule } from '@angular/common';
 import { addIcons } from 'ionicons';
 import { checkmarkCircleOutline } from 'ionicons/icons';
@@ -25,7 +28,9 @@ addIcons({
   templateUrl: 'tab2.page.html',
   styleUrls: ['tab2.page.scss'],
   standalone: true,
-  imports: [IonCardContent, IonCard, 
+  imports: [
+    IonCardContent,
+    IonCard,
     IonHeader,
     IonToolbar,
     IonTitle,
@@ -45,10 +50,10 @@ export class Tab2Page implements OnInit {
     allAnswers: string[];
     completed: boolean;
     selectedAnswer?: string;
-  }[] = []; // Typage explicite des questions
+  }[] = [];
   isLoading = true;
   categoryId!: number;
-  currentQuestionIndex = 0; // Index de la question en cours
+  currentQuestionIndex = 0;
   showNextQuestionTimeout: any;
 
   constructor(private triviaService: TriviaService, private route: ActivatedRoute) {}
@@ -62,9 +67,6 @@ export class Tab2Page implements OnInit {
     });
   }
 
-  /**
-   * Charge les questions de la catégorie sélectionnée
-   */
   loadQuestions(): void {
     const cachedQuestions = this.triviaService.getCachedQuestions();
 
@@ -95,11 +97,6 @@ export class Tab2Page implements OnInit {
     }
   }
 
-  /**
-   * Gère la sélection d'une réponse par l'utilisateur
-   * @param question La question en cours
-   * @param selectedAnswer La réponse sélectionnée
-   */
   selectAnswer(question: any, selectedAnswer: string): void {
     if (!question.completed) {
       question.completed = true;
@@ -109,7 +106,6 @@ export class Tab2Page implements OnInit {
         decode(selectedAnswer).trim().toLowerCase() === decode(question.correctAnswer).trim().toLowerCase();
       this.triviaService.incrementScores(isCorrect);
 
-      // Passer à la question suivante après 1,5 seconde
       clearTimeout(this.showNextQuestionTimeout);
       this.showNextQuestionTimeout = setTimeout(() => {
         this.goToNextQuestion();
@@ -117,23 +113,14 @@ export class Tab2Page implements OnInit {
     }
   }
 
-  /**
-   * Passe à la question suivante ou termine le quiz
-   */
   goToNextQuestion(): void {
     if (this.currentQuestionIndex < this.questions.length - 1) {
       this.currentQuestionIndex++;
     } else {
       console.log('Quiz terminé');
-      // Logique pour terminer le quiz ou afficher un message de fin
     }
   }
 
-  /**
-   * Mélange les réponses pour les afficher dans un ordre aléatoire
-   * @param answers Les réponses à mélanger
-   * @returns Un tableau de réponses mélangées
-   */
   shuffleAnswers(answers: string[]): string[] {
     return answers.sort(() => Math.random() - 0.5);
   }

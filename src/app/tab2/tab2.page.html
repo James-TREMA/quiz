@@ -11,15 +11,12 @@
     </ion-toolbar>
   </ion-header>
 
-  <!-- Conteneur de la question et des réponses -->
   <div class="quiz-container">
     <div class="quiz-card" *ngIf="!isLoading">
-      <!-- Affichage de la question -->
       <div class="question" *ngIf="questions.length > 0">
         <p [innerHTML]="questions[currentQuestionIndex].question"></p>
       </div>
 
-      <!-- Affichage des réponses -->
       <div class="answers">
         <ion-button
           *ngFor="let answer of questions[currentQuestionIndex].allAnswers"
@@ -35,8 +32,6 @@
         </ion-button>
       </div>
     </div>
-
-    <!-- Spinner de chargement -->
     <ion-spinner *ngIf="isLoading"></ion-spinner>
   </div>
 </ion-content>
