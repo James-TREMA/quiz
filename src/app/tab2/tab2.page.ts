@@ -56,9 +56,12 @@ export class Tab2Page implements OnInit {
   categoryId!: number;
   currentQuestionIndex = 0;
   showNextQuestionTimeout: any;
-  toastController: any;
 
-  constructor(private triviaService: TriviaService, private route: ActivatedRoute) {}
+  constructor(
+    private triviaService: TriviaService,
+    private route: ActivatedRoute,
+    private toastController: ToastController // Injection correcte ici
+  ) {}
 
   ngOnInit(): void {
     console.log('Initialisation de la page Tab2');
@@ -70,12 +73,12 @@ export class Tab2Page implements OnInit {
     });
   }
 
-    // Fonction pour afficher une notification
+  // Fonction pour afficher une notification
   async presentToast(message: string, duration: number = 3000) {
     const toast = await this.toastController.create({
       message,
       duration,
-      position: 'bottom',
+      position: 'top', // Pour afficher en bas on utilise bottom mais on l'affiche en haut donc top
     });
     await toast.present();
   }
@@ -83,7 +86,10 @@ export class Tab2Page implements OnInit {
   ionViewWillEnter(): void {
     console.log('Retour sur Tab2. Rechargement des données.');
     const cachedQuestions = this.triviaService.getCachedQuestions();
-    if (cachedQuestions.length > 0 && this.triviaService.getCachedCategoryId() === this.categoryId) {
+    if (
+      cachedQuestions.length > 0 &&
+      this.triviaService.getCachedCategoryId() === this.categoryId
+    ) {
       this.questions = cachedQuestions;
       this.isLoading = false;
     } else {
@@ -93,14 +99,13 @@ export class Tab2Page implements OnInit {
   }
 
   loadQuestions(): void {
-    // Indiquer que les données sont en cours de chargement
     this.isLoading = true;
-  
-    this.triviaService.getQuestionsWithDelay(10, this.categoryId)
+
+    this.triviaService
+      .getQuestionsWithDelay(10, this.categoryId)
       .then((observable) => {
         observable.subscribe({
           next: (data: { results: any[] }) => {
-            // Vérifier que les données sont valides
             console.log('Données reçues de l\'API :', data);
             if (data && Array.isArray(data.results) && data.results.length > 0) {
               this.questions = data.results.map((q) => ({
@@ -108,24 +113,29 @@ export class Tab2Page implements OnInit {
                 correctAnswer: decode(q.correct_answer || ''),
                 allAnswers: this.shuffleAnswers([
                   decode(q.correct_answer || ''),
-                  ...(q.incorrect_answers || []).map((ans: string) => decode(ans || '')),
+                  ...(q.incorrect_answers || []).map((ans: string) =>
+                    decode(ans || '')
+                  ),
                 ]),
                 completed: false,
               }));
-              // Mettre en cache les questions
               this.triviaService.setCachedQuestions(this.questions);
               this.triviaService.setCachedCategoryId(this.categoryId);
             } else {
               console.warn('Aucune question valide retournée par l\'API.');
-              alert('Aucune question disponible pour cette catégorie. Veuillez réessayer plus tard.');
+              this.presentToast(
+                'Aucune question disponible pour cette catégorie. Veuillez réessayer plus tard.'
+              );
             }
-            this.isLoading = false; // Fin du chargement
+            this.isLoading = false;
           },
           error: (err) => {
             console.error('Erreur lors du chargement des questions :', err);
             this.isLoading = false;
             if (err.message.includes('429')) {
-              this.presentToast('Vous avez atteint la limite de requêtes. Veuillez patienter et réessayer.');
+              this.presentToast(
+                'Vous avez atteint la limite de requêtes. Veuillez patienter et réessayer.'
+              );
             } else {
               this.presentToast('Une erreur est survenue. Veuillez réessayer.');
             }
@@ -135,10 +145,12 @@ export class Tab2Page implements OnInit {
       .catch((err) => {
         console.error('Erreur lors de la configuration de la requête :', err);
         this.isLoading = false;
-        alert('Impossible de charger les questions. Veuillez réessayer.');
+        this.presentToast(
+          'Impossible de charger les questions. Veuillez réessayer.'
+        );
       });
   }
-  
+
   selectAnswer(question: any, selectedAnswer: string): void {
     if (!question.completed) {
       question.completed = true;
@@ -148,7 +160,8 @@ export class Tab2Page implements OnInit {
       console.log('Réponse correcte :', question.correctAnswer);
 
       const isCorrect =
-        decode(selectedAnswer).trim().toLowerCase() === decode(question.correctAnswer).trim().toLowerCase();
+        decode(selectedAnswer).trim().toLowerCase() ===
+        decode(question.correctAnswer).trim().toLowerCase();
       this.triviaService.incrementScores(isCorrect);
 
       console.log('Mise à jour des scores effectuée :', this.triviaService.getScores());
@@ -165,6 +178,9 @@ export class Tab2Page implements OnInit {
       this.currentQuestionIndex++;
     } else {
       console.log('Quiz terminé');
+      this.presentToast(
+        'Quiz terminé'
+      );
     }
   }
 
