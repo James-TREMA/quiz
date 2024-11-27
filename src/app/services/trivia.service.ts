@@ -98,7 +98,7 @@ export class TriviaService {
 
   setCachedQuestions(questions: any[]): void {
     this.cachedQuestions = questions;
-    localStorage.setItem('cachedQuestions', JSON.stringify(questions)); // Ajout dans le stockage local
+    localStorage.setItem('cachedQuestions', JSON.stringify(questions)); // Stockage local
   }
 
   getCachedCategoryId(): number | null {
@@ -107,7 +107,7 @@ export class TriviaService {
 
   setCachedCategoryId(categoryId: number): void {
     this.cachedCategoryId = categoryId;
-    localStorage.setItem('cachedCategoryId', JSON.stringify(categoryId)); // Ajout dans le stockage local
+    localStorage.setItem('cachedCategoryId', JSON.stringify(categoryId)); // Stockage local
   }
 
   restoreCache(): void {
