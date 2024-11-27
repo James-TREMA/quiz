@@ -98,8 +98,11 @@ export class Tab2Page implements OnInit {
     if (!question.completed) {
       question.completed = true; // Marquer la question comme complétée
       question.selectedAnswer = selectedAnswer;
-
-      if (selectedAnswer === question.correctAnswer) {
+  
+      const decodedSelectedAnswer = decode(selectedAnswer).trim().toLowerCase();
+      const decodedCorrectAnswer = decode(question.correctAnswer).trim().toLowerCase();
+  
+      if (decodedSelectedAnswer === decodedCorrectAnswer) {
         this.triviaService.incrementScores(true); // Bonne réponse
       } else {
         this.triviaService.incrementScores(false); // Mauvaise réponse
