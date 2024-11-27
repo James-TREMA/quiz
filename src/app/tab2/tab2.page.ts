@@ -86,7 +86,6 @@ export class Tab2Page implements OnInit {
   ionViewWillEnter(): void {
     console.log('Retour sur Tab2. Rechargement des données.');
     
-    // Restaurer le cache depuis le service
     this.triviaService.restoreCache();
     
     const cachedQuestions = this.triviaService.getCachedQuestions();
@@ -94,8 +93,15 @@ export class Tab2Page implements OnInit {
       cachedQuestions.length > 0 &&
       this.triviaService.getCachedCategoryId() === this.categoryId
     ) {
-      this.questions = cachedQuestions; // Restaurer les questions depuis le service
-      console.log('Questions restaurées :', cachedQuestions);
+      // Compléter les réponses manquantes
+      this.questions = cachedQuestions.map((q) => ({
+        ...q,
+        allAnswers: q.allAnswers?.length ? q.allAnswers : this.shuffleAnswers([
+          q.correctAnswer,
+          ...(q.incorrect_answers || []),
+        ]),
+      }));
+      console.log('Questions restaurées avec allAnswers régénérées :', this.questions);
       this.isLoading = false;
     } else {
       this.loadQuestions();
@@ -103,10 +109,9 @@ export class Tab2Page implements OnInit {
   }
   
   
-  
   loadQuestions(): void {
     this.isLoading = true;
-
+  
     this.triviaService
       .getQuestionsWithDelay(10, this.categoryId)
       .then((observable) => {
@@ -125,6 +130,7 @@ export class Tab2Page implements OnInit {
                 ]),
                 completed: false,
               }));
+              console.log('Questions générées avec allAnswers :', this.questions);
               this.triviaService.setCachedQuestions(this.questions);
               this.triviaService.setCachedCategoryId(this.categoryId);
             } else {
@@ -156,7 +162,7 @@ export class Tab2Page implements OnInit {
         );
       });
   }
-
+  
   selectAnswer(question: any, selectedAnswer: string): void {
     if (!question.completed) {
       question.completed = true;
