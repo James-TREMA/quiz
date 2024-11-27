@@ -82,6 +82,7 @@ export class TriviaService {
   clearCache(): void {
     this.cachedQuestions = [];
     this.cachedCategoryId = null;
+    console.log('Cache des questions vidé');
   }
 
   getScores(): { totalAnswers: number; correctAnswers: number; incorrectAnswers: number } {
@@ -97,8 +98,8 @@ export class TriviaService {
     const scores = { totalAnswers, correctAnswers, incorrectAnswers };
     console.log('Enregistrement des scores dans localStorage :', scores);
     localStorage.setItem(this.scoresKey, JSON.stringify(scores));
-  }  
-
+  }
+    
   clearScores(): void {
     localStorage.removeItem(this.scoresKey);
   }
