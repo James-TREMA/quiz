@@ -99,9 +99,13 @@ export class Tab2Page implements OnInit {
       error: (err) => {
         console.error('Erreur lors du chargement des questions', err);
         this.isLoading = false;
+        if (err.message.includes('Limite de requêtes atteinte')) {
+          alert('Vous avez atteint la limite de requêtes. Veuillez réessayer plus tard.');
+        }
       },
     });
   }
+  
 
   selectAnswer(question: any, selectedAnswer: string): void {
     if (!question.completed) {

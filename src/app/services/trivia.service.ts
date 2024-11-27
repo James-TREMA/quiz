@@ -27,14 +27,15 @@ export class TriviaService {
 
   getQuestions(amount: number, categoryId?: number): Observable<any> {
     if (this.cachedQuestions.length > 0 && this.cachedCategoryId === categoryId) {
+      console.log('Utilisation des questions en cache.');
       return of({ results: this.cachedQuestions });
     }
-
+  
     const params = new URLSearchParams({ amount: `${amount}` });
     if (categoryId) params.append('category', `${categoryId}`);
-
+  
     const url = `${this.apiUrl}?${params.toString()}`;
-
+  
     return this.http.get<any>(url).pipe(
       tap((response) => {
         response.results = response.results.map((q: any) => ({
@@ -47,12 +48,16 @@ export class TriviaService {
         this.cachedCategoryId = categoryId;
       }),
       catchError((error) => {
-        console.error('Erreur lors de la récupération des questions', error);
+        if (error.status === 429) {
+          console.error('Limite de requêtes atteinte. Réessayez plus tard.');
+        } else {
+          console.error('Erreur lors de la récupération des questions', error);
+        }
         return throwError(() => new Error('Erreur de chargement des questions'));
       })
     );
   }
-
+  
   getCachedQuestions(): any[] {
     return this.cachedQuestions;
   }
@@ -110,4 +115,13 @@ export class TriviaService {
 
     console.log('Scores après mise à jour :', scores);
   }
+
+  private delay(ms: number): Promise<void> {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+  
+  async getQuestionsWithDelay(amount: number, categoryId?: number): Promise<Observable<any>> {
+    await this.delay(1000); // Pause de 1 seconde entre les appels
+    return this.getQuestions(amount, categoryId);
+  }  
 }
