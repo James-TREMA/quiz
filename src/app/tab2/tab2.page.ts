@@ -91,6 +91,7 @@ export class Tab2Page implements OnInit {
       this.triviaService.getCachedCategoryId() === this.categoryId
     ) {
       this.questions = cachedQuestions; // Restaurer les questions depuis le service
+      console.log(cachedQuestions)
       this.isLoading = false;
     } else {
       this.loadQuestions();
