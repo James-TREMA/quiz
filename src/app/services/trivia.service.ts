@@ -86,16 +86,18 @@ export class TriviaService {
 
   getScores(): { totalAnswers: number; correctAnswers: number; incorrectAnswers: number } {
     const scores = localStorage.getItem(this.scoresKey);
+    console.log('Scores récupérés depuis localStorage :', scores);
     if (scores) {
       return JSON.parse(scores);
     }
     return { totalAnswers: 0, correctAnswers: 0, incorrectAnswers: 0 };
   }
-
+  
   setScores(totalAnswers: number, correctAnswers: number, incorrectAnswers: number): void {
     const scores = { totalAnswers, correctAnswers, incorrectAnswers };
+    console.log('Enregistrement des scores dans localStorage :', scores);
     localStorage.setItem(this.scoresKey, JSON.stringify(scores));
-  }
+  }  
 
   clearScores(): void {
     localStorage.removeItem(this.scoresKey);

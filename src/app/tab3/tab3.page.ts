@@ -42,15 +42,17 @@ export class Tab3Page implements OnInit {
   constructor(private triviaService: TriviaService) {}
 
   ngOnInit() {
+    console.log('Initialisation de la page Tab3');
     this.updateScores();
   }
-
+  
   updateScores() {
     const scores = this.triviaService.getScores();
+    console.log('Scores rechargés depuis localStorage :', scores);
     this.totalAnswers = scores.totalAnswers;
     this.correctAnswers = scores.correctAnswers;
     this.incorrectAnswers = scores.incorrectAnswers;
-  }
+  }  
 
   onProfileImageChange(event: any) {
     const file = event.target.files[0];

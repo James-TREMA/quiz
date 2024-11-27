@@ -59,13 +59,26 @@ export class Tab2Page implements OnInit {
   constructor(private triviaService: TriviaService, private route: ActivatedRoute) {}
 
   ngOnInit(): void {
-    this.route.queryParams.subscribe((params) => {
-      if (params['categoryId']) {
-        this.categoryId = +params['categoryId'];
-        this.loadQuestions();
-      }
-    });
+    console.log('Initialisation de la page Tab2');
+    
+    // Recharger les scores
+    console.log('Scores actuels avant rechargement :', this.triviaService.getScores());
+  
+    // Recharger les questions
+    const cachedQuestions = this.triviaService.getCachedQuestions();
+    if (cachedQuestions.length > 0 && this.triviaService.getCachedCategoryId() === this.categoryId) {
+      console.log('Questions récupérées depuis le cache.');
+      this.questions = cachedQuestions;
+      this.isLoading = false;
+    } else {
+      console.log('Cache vide ou catégorie différente. Chargement des questions depuis l\'API.');
+      this.loadQuestions();
+    }
+  
+    console.log('Scores après rechargement :', this.triviaService.getScores());
   }
+  
+  
 
   loadQuestions(): void {
     const cachedQuestions = this.triviaService.getCachedQuestions();
