@@ -3,7 +3,6 @@ import { IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonSpinn
 import { ExploreContainerComponent } from '../explore-container/explore-container.component';
 import { TriviaService } from '../services/trivia.service';
 import { CommonModule } from '@angular/common';
-
 import { addIcons } from 'ionicons';
 import { pricetagOutline } from 'ionicons/icons';
 import { Router } from '@angular/router';
@@ -19,34 +18,37 @@ addIcons({
   standalone: true,
   imports: [IonIcon, IonSpinner, IonItem, IonList, IonHeader, IonToolbar, IonTitle, IonContent, ExploreContainerComponent, CommonModule],
 })
-
 export class Tab1Page implements OnInit {
-  categories: any[] = [];
+  categories: { id: number; name: string }[] = []; // Typage explicite des catégories
   isLoading = true;
 
-  constructor(private triviaService: TriviaService, private router: Router) {
-    addIcons({pricetagOutline});
-  }
+  constructor(private triviaService: TriviaService, private router: Router) {}
 
   ngOnInit() {
-    this.loadCategories();
+    this.loadCategories(); // Chargement des catégories au démarrage
   }
 
-  loadCategories() {
+  /**
+   * Charge les catégories de questions depuis le service
+   */
+  loadCategories(): void {
     this.triviaService.getCategories().subscribe({
-      next: (data) => {
-        this.categories = data.trivia_categories || [];
-        this.isLoading = false;
+      next: (data: { trivia_categories: { id: number; name: string }[] }) => {
+        this.categories = data.trivia_categories || []; // Stocke les catégories ou une liste vide
+        this.isLoading = false; // Arrête le spinner de chargement
       },
-      error: (err) => {
+      error: (err: any) => {
         console.error('Erreur lors du chargement des catégories', err);
-        this.isLoading = false;
+        this.isLoading = false; // Arrête le spinner même en cas d'erreur
       },
     });
   }
 
-  // Appelé lors du clic sur un thème
-  goToQuestions(categoryId: number) {
+  /**
+   * Navigue vers les questions d'une catégorie spécifique
+   * @param categoryId ID de la catégorie sélectionnée
+   */
+  goToQuestions(categoryId: number): void {
     this.router.navigate(['/tabs/tab2'], { queryParams: { categoryId } });
   }
 }
