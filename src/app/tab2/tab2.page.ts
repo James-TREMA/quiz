@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { decode } from 'html-entities';
 import { TriviaService } from '../services/trivia.service';
 import { ActivatedRoute } from '@angular/router';
 import {
@@ -91,7 +92,7 @@ export class Tab2Page implements OnInit {
       [answers[i], answers[j]] = [answers[j], answers[i]];
     }
     return answers;
-  }    
+  }  
 
   selectAnswer(question: any, selectedAnswer: string) {
     if (!question.completed) {
@@ -105,8 +106,4 @@ export class Tab2Page implements OnInit {
       }
     }
   }
-}
-
-function decode(correct_answer: any): string {
-  throw new Error('Function not implemented.');
 }
