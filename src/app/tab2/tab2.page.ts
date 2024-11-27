@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { ToastController } from '@ionic/angular';
 import { decode } from 'html-entities';
 import { TriviaService } from '../services/trivia.service';
 import { ActivatedRoute } from '@angular/router';
@@ -55,6 +56,7 @@ export class Tab2Page implements OnInit {
   categoryId!: number;
   currentQuestionIndex = 0;
   showNextQuestionTimeout: any;
+  toastController: any;
 
   constructor(private triviaService: TriviaService, private route: ActivatedRoute) {}
 
@@ -66,6 +68,16 @@ export class Tab2Page implements OnInit {
         this.loadQuestions();
       }
     });
+  }
+
+    // Fonction pour afficher une notification
+  async presentToast(message: string, duration: number = 3000) {
+    const toast = await this.toastController.create({
+      message,
+      duration,
+      position: 'bottom',
+    });
+    await toast.present();
   }
 
   ionViewWillEnter(): void {
@@ -113,9 +125,9 @@ export class Tab2Page implements OnInit {
             console.error('Erreur lors du chargement des questions :', err);
             this.isLoading = false;
             if (err.message.includes('429')) {
-              // alert('Vous avez atteint la limite de requêtes. Veuillez patienter et réessayer.');
+              this.presentToast('Vous avez atteint la limite de requêtes. Veuillez patienter et réessayer.');
             } else {
-              // alert('Une erreur est survenue. Veuillez réessayer.');
+              this.presentToast('Une erreur est survenue. Veuillez réessayer.');
             }
           },
         });
