@@ -73,6 +73,10 @@ export class Tab2Page implements OnInit {
     });
   }
 
+  shuffleAnswers(answers: string[]): string[] {
+    return answers.sort(() => Math.random() - 0.5);
+  }
+
   // Fonction pour afficher une notification
   async presentToast(message: string, duration: number = 3000) {
     const toast = await this.toastController.create({
@@ -194,9 +198,5 @@ export class Tab2Page implements OnInit {
         'Quiz terminé'
       );
     }
-  }
-
-  shuffleAnswers(answers: string[]): string[] {
-    return answers.sort(() => Math.random() - 0.5);
   }
 }

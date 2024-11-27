@@ -43,24 +43,26 @@ export class TriviaService {
       console.log('Utilisation des questions en cache.');
       return of({ results: this.cachedQuestions });
     }
-
+  
     const params = new URLSearchParams({ amount: `${amount}` });
     if (categoryId) params.append('category', `${categoryId}`);
-
+  
     const url = `${this.apiUrl}?${params.toString()}`;
-
+  
     return this.http.get<any>(url).pipe(
       tap((response) => {
         if (response && Array.isArray(response.results)) {
           response.results = response.results.map((q: any) => ({
             ...q,
             question: decode(q.question),
-            correct_answer: decode(q.correct_answer),
-            incorrect_answers: q.incorrect_answers.map((ans: string) => decode(ans)),
+            correctAnswer: decode(q.correct_answer),
+            allAnswers: this.shuffleAnswers([
+              decode(q.correct_answer),
+              ...(q.incorrect_answers || []).map((ans: string) => decode(ans)),
+            ]),
           }));
           this.setCachedQuestions(response.results);
-
-          // Correction ici pour vérifier si categoryId est défini
+  
           if (categoryId !== undefined) {
             this.setCachedCategoryId(categoryId);
           }
@@ -80,7 +82,7 @@ export class TriviaService {
       })
     );
   }
-
+  
   // Récupérer des questions avec délai
   async getQuestionsWithDelay(amount: number, categoryId?: number): Promise<Observable<any>> {
     await this.delay(1000); // Pause de 1 seconde entre les appels
