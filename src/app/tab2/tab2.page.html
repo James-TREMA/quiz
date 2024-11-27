@@ -11,25 +11,18 @@
     </ion-toolbar>
   </ion-header>
 
-  <!-- Liste des questions -->
+  <!-- Afficher la question en cours -->
   <ion-list *ngIf="!isLoading">
-    <ion-item *ngFor="let question of questions">
-      <p [innerHTML]="question.question"></p>
-  
-      <!-- Icône pour les questions complétées -->
-      <ion-icon
-        *ngIf="question.completed"
-        name="checkmark-circle-outline"
-        slot="end"
-        color="success"
-      ></ion-icon>
-  
+    <ion-item *ngIf="questions.length > 0">
+      <p [innerHTML]="questions[currentQuestionIndex].question"></p>
+
       <!-- Réponses -->
       <div class="answers">
         <ion-button
-          *ngFor="let answer of question.allAnswers"
-          (click)="selectAnswer(question, answer)"
-          [disabled]="question.completed"
+          *ngFor="let answer of questions[currentQuestionIndex].allAnswers"
+          (click)="selectAnswer(questions[currentQuestionIndex], answer)"
+          [disabled]="questions[currentQuestionIndex].completed"
+          [color]="answer === questions[currentQuestionIndex].correctAnswer && questions[currentQuestionIndex].completed ? 'success' : ''"
           expand="block"
           fill="outline"
         >

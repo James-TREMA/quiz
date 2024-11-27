@@ -25,6 +25,11 @@ ion-content {
     flex-wrap: wrap;
     gap: 10px;
   }
+
+  ion-button[color='success'] {
+    background-color: #4caf50 !important;
+    color: white !important;
+  }  
   
   ion-button {
     flex: 1 1 calc(50% - 10px);

@@ -40,10 +40,13 @@ addIcons({
     CommonModule,
   ],
 })
+
 export class Tab2Page implements OnInit {
   questions: any[] = [];
   isLoading = true;
   categoryId!: number;
+  currentQuestionIndex = 0; // Index de la question en cours
+  showNextQuestionTimeout: any;
 
   constructor(private triviaService: TriviaService, private route: ActivatedRoute) {}
 
@@ -70,9 +73,10 @@ export class Tab2Page implements OnInit {
             correctAnswer: decode(q.correct_answer),
             allAnswers: this.shuffleAnswers([
               decode(q.correct_answer),
-              ...q.incorrect_answers.map((ans: string) => decode(ans))
+              ...q.incorrect_answers.map((ans: string) => decode(ans)),
             ]),
             completed: false,
+            selectedAnswer: null,
           }));
           this.triviaService.setCachedQuestions(this.questions);
           this.triviaService.setCachedCategoryId(this.categoryId);
@@ -86,27 +90,36 @@ export class Tab2Page implements OnInit {
     }
   }
 
+  selectAnswer(question: any, selectedAnswer: string) {
+    if (!question.completed) {
+      question.completed = true;
+      question.selectedAnswer = selectedAnswer;
+
+      const isCorrect = decode(selectedAnswer).trim().toLowerCase() === decode(question.correctAnswer).trim().toLowerCase();
+      this.triviaService.incrementScores(isCorrect);
+
+      // Passer à la question suivante après 1,5 seconde
+      clearTimeout(this.showNextQuestionTimeout);
+      this.showNextQuestionTimeout = setTimeout(() => {
+        this.goToNextQuestion();
+      }, 1500);
+    }
+  }
+
+  goToNextQuestion() {
+    if (this.currentQuestionIndex < this.questions.length - 1) {
+      this.currentQuestionIndex++;
+    } else {
+      console.log('Quiz terminé');
+      // Logique pour terminer le quiz ou afficher un message de fin
+    }
+  }
+
   shuffleAnswers(answers: string[]): string[] {
     for (let i = answers.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [answers[i], answers[j]] = [answers[j], answers[i]];
     }
     return answers;
-  }  
-
-  selectAnswer(question: any, selectedAnswer: string) {
-    if (!question.completed) {
-      question.completed = true; // Marquer la question comme complétée
-      question.selectedAnswer = selectedAnswer;
-  
-      const decodedSelectedAnswer = decode(selectedAnswer).trim().toLowerCase();
-      const decodedCorrectAnswer = decode(question.correctAnswer).trim().toLowerCase();
-  
-      if (decodedSelectedAnswer === decodedCorrectAnswer) {
-        this.triviaService.incrementScores(true); // Bonne réponse
-      } else {
-        this.triviaService.incrementScores(false); // Mauvaise réponse
-      }
-    }
   }
 }
