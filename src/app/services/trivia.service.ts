@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, of, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { decode } from 'html-entities';
+import { ToastController } from '@ionic/angular';
 
 @Injectable({
   providedIn: 'root',
@@ -13,7 +14,17 @@ export class TriviaService {
   private cachedCategoryId: number | null | undefined = null;
   private readonly scoresKey = 'triviaScores';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private toastController: ToastController) {}
+
+  // Fonction pour afficher une notification
+  async presentToast(message: string, duration: number = 3000) {
+    const toast = await this.toastController.create({
+      message,
+      duration,
+      position: 'top', // Pour afficher en bas on utilise bottom mais on l'affiche en haut donc top
+    });
+    await toast.present();
+  }
 
   getCategories(): Observable<{ trivia_categories: { id: number; name: string }[] }> {
     const url = 'https://opentdb.com/api_category.php';
@@ -55,6 +66,7 @@ export class TriviaService {
       catchError((error) => {
         if (error.status === 429) {
           console.error('Limite de requêtes atteinte. Réessayez plus tard.');
+          this.presentToast('Limite de requêtes atteinte. Réessayez plus tard.');
         } else {
           console.error('Erreur lors de la récupération des questions', error);
         }
