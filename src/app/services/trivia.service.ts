@@ -58,6 +58,15 @@ export class TriviaService {
     );
   }
   
+  async getQuestionsWithDelay(amount: number, categoryId?: number): Promise<Observable<any>> {
+    await this.delay(1000); // Pause de 1 seconde entre les appels
+    return this.getQuestions(amount, categoryId);
+  }
+
+  private delay(ms: number): Promise<void> {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
   getCachedQuestions(): any[] {
     return this.cachedQuestions;
   }
@@ -115,13 +124,4 @@ export class TriviaService {
 
     console.log('Scores après mise à jour :', scores);
   }
-
-  private delay(ms: number): Promise<void> {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-  }
-  
-  async getQuestionsWithDelay(amount: number, categoryId?: number): Promise<Observable<any>> {
-    await this.delay(1000); // Pause de 1 seconde entre les appels
-    return this.getQuestions(amount, categoryId);
-  }  
 }
