@@ -65,9 +65,12 @@ export class Tab2Page implements OnInit {
       this.triviaService.getQuestions(10, this.categoryId).subscribe({
         next: (data) => {
           this.questions = data.results.map((q: any) => ({
-            question: q.question,
-            correctAnswer: q.correct_answer,
-            allAnswers: this.shuffleAnswers([q.correct_answer, ...q.incorrect_answers]),
+            question: decode(q.question),
+            correctAnswer: decode(q.correct_answer),
+            allAnswers: this.shuffleAnswers([
+              decode(q.correct_answer),
+              ...q.incorrect_answers.map((ans: string) => decode(ans))
+            ]),
             completed: false,
           }));
           this.triviaService.setCachedQuestions(this.questions);
@@ -88,7 +91,7 @@ export class Tab2Page implements OnInit {
       [answers[i], answers[j]] = [answers[j], answers[i]];
     }
     return answers;
-  }  
+  }    
 
   selectAnswer(question: any, selectedAnswer: string) {
     if (!question.completed) {
@@ -102,4 +105,8 @@ export class Tab2Page implements OnInit {
       }
     }
   }
+}
+
+function decode(correct_answer: any): string {
+  throw new Error('Function not implemented.');
 }
