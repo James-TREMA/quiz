@@ -11,8 +11,7 @@ import {
   IonItem,
   IonSpinner,
   IonButton,
-  IonIcon,
-} from '@ionic/angular/standalone';
+  IonIcon, IonCard, IonCardContent } from '@ionic/angular/standalone';
 import { CommonModule } from '@angular/common';
 import { addIcons } from 'ionicons';
 import { checkmarkCircleOutline } from 'ionicons/icons';
@@ -26,7 +25,7 @@ addIcons({
   templateUrl: 'tab2.page.html',
   styleUrls: ['tab2.page.scss'],
   standalone: true,
-  imports: [
+  imports: [IonCardContent, IonCard, 
     IonHeader,
     IonToolbar,
     IonTitle,

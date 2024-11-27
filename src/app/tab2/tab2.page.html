@@ -11,27 +11,32 @@
     </ion-toolbar>
   </ion-header>
 
-  <!-- Afficher la question en cours -->
-  <ion-list *ngIf="!isLoading">
-    <ion-item *ngIf="questions.length > 0">
-      <p [innerHTML]="questions[currentQuestionIndex].question"></p>
+  <!-- Conteneur de la question et des réponses -->
+  <div class="quiz-container">
+    <div class="quiz-card" *ngIf="!isLoading">
+      <!-- Affichage de la question -->
+      <div class="question" *ngIf="questions.length > 0">
+        <p [innerHTML]="questions[currentQuestionIndex].question"></p>
+      </div>
 
-      <!-- Réponses -->
+      <!-- Affichage des réponses -->
       <div class="answers">
         <ion-button
           *ngFor="let answer of questions[currentQuestionIndex].allAnswers"
           (click)="selectAnswer(questions[currentQuestionIndex], answer)"
           [disabled]="questions[currentQuestionIndex].completed"
-          [color]="answer === questions[currentQuestionIndex].correctAnswer && questions[currentQuestionIndex].completed ? 'success' : ''"
+          [class.selected-answer]="questions[currentQuestionIndex].selectedAnswer === answer"
+          [class.correct-answer]="questions[currentQuestionIndex].completed && answer === questions[currentQuestionIndex].correctAnswer"
+          [class.incorrect-answer]="questions[currentQuestionIndex].completed && answer !== questions[currentQuestionIndex].correctAnswer && questions[currentQuestionIndex].selectedAnswer === answer"
           expand="block"
           fill="outline"
         >
           {{ answer }}
         </ion-button>
       </div>
-    </ion-item>
-  </ion-list>
+    </div>
 
-  <!-- Spinner de chargement -->
-  <ion-spinner *ngIf="isLoading"></ion-spinner>
+    <!-- Spinner de chargement -->
+    <ion-spinner *ngIf="isLoading"></ion-spinner>
+  </div>
 </ion-content>
