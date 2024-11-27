@@ -81,31 +81,33 @@ export class Tab2Page implements OnInit {
   }
 
   loadQuestions(): void {
-    this.triviaService.getQuestions(10, this.categoryId).subscribe({
-      next: (data: { results: any[] }) => {
-        this.questions = data.results.map((q) => ({
-          question: decode(q.question),
-          correctAnswer: decode(q.correct_answer),
-          allAnswers: this.shuffleAnswers([
-            decode(q.correct_answer),
-            ...q.incorrect_answers.map((ans: string) => decode(ans)),
-          ]),
-          completed: false,
-        }));
-        this.triviaService.setCachedQuestions(this.questions);
-        this.triviaService.setCachedCategoryId(this.categoryId);
-        this.isLoading = false;
-      },
-      error: (err) => {
-        console.error('Erreur lors du chargement des questions', err);
-        this.isLoading = false;
-        if (err.message.includes('Limite de requêtes atteinte')) {
-          alert('Vous avez atteint la limite de requêtes. Veuillez réessayer plus tard.');
-        }
-      },
+    // Appeler la méthode avec délai
+    this.triviaService.getQuestionsWithDelay(10, this.categoryId).then((observable) => {
+      observable.subscribe({
+        next: (data: { results: any[] }) => {
+          this.questions = data.results.map((q) => ({
+            question: decode(q.question),
+            correctAnswer: decode(q.correct_answer),
+            allAnswers: this.shuffleAnswers([
+              decode(q.correct_answer),
+              ...q.incorrect_answers.map((ans: string) => decode(ans)),
+            ]),
+            completed: false,
+          }));
+          this.triviaService.setCachedQuestions(this.questions);
+          this.triviaService.setCachedCategoryId(this.categoryId);
+          this.isLoading = false;
+        },
+        error: (err) => {
+          console.error('Erreur lors du chargement des questions', err);
+          this.isLoading = false;
+          if (err.message.includes('Limite de requêtes atteinte')) {
+            alert('Vous avez atteint la limite de requêtes. Veuillez réessayer plus tard.');
+          }
+        },
+      });
     });
-  }
-  
+  }    
 
   selectAnswer(question: any, selectedAnswer: string): void {
     if (!question.completed) {
