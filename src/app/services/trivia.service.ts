@@ -103,12 +103,18 @@ export class TriviaService {
 
   incrementScores(isCorrect: boolean): void {
     const scores = this.getScores();
+    console.log('Scores avant mise à jour :', scores);
+  
     scores.totalAnswers++;
     if (isCorrect) {
       scores.correctAnswers++;
+      console.log('Bonne réponse ajoutée.');
     } else {
       scores.incorrectAnswers++;
+      console.log('Mauvaise réponse ajoutée.');
     }
     this.setScores(scores.totalAnswers, scores.correctAnswers, scores.incorrectAnswers);
-  }
+  
+    console.log('Scores après mise à jour :', scores);
+  }  
 }

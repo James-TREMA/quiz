@@ -101,17 +101,22 @@ export class Tab2Page implements OnInit {
     if (!question.completed) {
       question.completed = true;
       question.selectedAnswer = selectedAnswer;
-
+  
+      console.log('Réponse sélectionnée :', selectedAnswer);
+      console.log('Réponse correcte :', question.correctAnswer);
+  
       const isCorrect =
         decode(selectedAnswer).trim().toLowerCase() === decode(question.correctAnswer).trim().toLowerCase();
       this.triviaService.incrementScores(isCorrect);
-
+  
+      console.log('Mise à jour des scores effectuée :', this.triviaService.getScores());
+  
       clearTimeout(this.showNextQuestionTimeout);
       this.showNextQuestionTimeout = setTimeout(() => {
         this.goToNextQuestion();
       }, 1500);
     }
-  }
+  }  
 
   goToNextQuestion(): void {
     if (this.currentQuestionIndex < this.questions.length - 1) {
