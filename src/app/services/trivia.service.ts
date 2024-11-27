@@ -8,17 +8,13 @@ import { decode } from 'html-entities';
   providedIn: 'root',
 })
 export class TriviaService {
-  private readonly apiUrl = 'https://opentdb.com/api.php'; // URL de l'API
-  private cachedQuestions: any[] = []; // Cache des questions
-  private cachedCategoryId: number | null | undefined = null; // Cache de la catégorie actuelle
-  private readonly scoresKey = 'triviaScores'; // Clé pour le stockage local des scores
+  private readonly apiUrl = 'https://opentdb.com/api.php';
+  private cachedQuestions: any[] = [];
+  private cachedCategoryId: number | null | undefined = null;
+  private readonly scoresKey = 'triviaScores';
 
   constructor(private http: HttpClient) {}
 
-  /**
-   * Récupère les catégories de l'API
-   * @returns Observable avec les catégories
-   */
   getCategories(): Observable<{ trivia_categories: { id: number; name: string }[] }> {
     const url = 'https://opentdb.com/api_category.php';
     return this.http.get<{ trivia_categories: { id: number; name: string }[] }>(url).pipe(
@@ -29,12 +25,6 @@ export class TriviaService {
     );
   }
 
-  /**
-   * Récupère des questions depuis l'API ou le cache
-   * @param amount Nombre de questions à récupérer
-   * @param categoryId ID de la catégorie
-   * @returns Observable avec les questions
-   */
   getQuestions(amount: number, categoryId?: number): Observable<any> {
     if (this.cachedQuestions.length > 0 && this.cachedCategoryId === categoryId) {
       return of({ results: this.cachedQuestions });
@@ -93,13 +83,13 @@ export class TriviaService {
     }
     return { totalAnswers: 0, correctAnswers: 0, incorrectAnswers: 0 };
   }
-  
+
   setScores(totalAnswers: number, correctAnswers: number, incorrectAnswers: number): void {
     const scores = { totalAnswers, correctAnswers, incorrectAnswers };
     console.log('Enregistrement des scores dans localStorage :', scores);
     localStorage.setItem(this.scoresKey, JSON.stringify(scores));
   }
-    
+
   clearScores(): void {
     localStorage.removeItem(this.scoresKey);
   }
@@ -107,7 +97,7 @@ export class TriviaService {
   incrementScores(isCorrect: boolean): void {
     const scores = this.getScores();
     console.log('Scores avant mise à jour :', scores);
-  
+
     scores.totalAnswers++;
     if (isCorrect) {
       scores.correctAnswers++;
@@ -117,7 +107,7 @@ export class TriviaService {
       console.log('Mauvaise réponse ajoutée.');
     }
     this.setScores(scores.totalAnswers, scores.correctAnswers, scores.incorrectAnswers);
-  
+
     console.log('Scores après mise à jour :', scores);
-  }  
+  }
 }

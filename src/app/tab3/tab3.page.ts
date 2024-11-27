@@ -45,14 +45,6 @@ export class Tab3Page implements OnInit {
     console.log('Initialisation de la page Tab3');
     this.updateScores();
   }
-  
-  updateScores() {
-    const scores = this.triviaService.getScores();
-    console.log('Scores rechargés depuis localStorage :', scores);
-    this.totalAnswers = scores.totalAnswers;
-    this.correctAnswers = scores.correctAnswers;
-    this.incorrectAnswers = scores.incorrectAnswers;
-  }  
 
   onProfileImageChange(event: any) {
     const file = event.target.files[0];
@@ -65,10 +57,24 @@ export class Tab3Page implements OnInit {
     }
   }
 
+  ionViewWillEnter(): void {
+    console.log('Retour sur Tab3. Rechargement des scores.');
+    this.updateScores();
+  }
+
+  updateScores() {
+    const scores = this.triviaService.getScores();
+    console.log('Scores rechargés depuis localStorage :', scores);
+    this.totalAnswers = scores.totalAnswers;
+    this.correctAnswers = scores.correctAnswers;
+    this.incorrectAnswers = scores.incorrectAnswers;
+  }
+
   resetScores() {
     this.triviaService.clearScores();
     this.totalAnswers = 0;
     this.correctAnswers = 0;
     this.incorrectAnswers = 0;
+    console.log('Scores réinitialisés.');
   }
 }

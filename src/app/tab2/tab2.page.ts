@@ -60,76 +60,69 @@ export class Tab2Page implements OnInit {
 
   ngOnInit(): void {
     console.log('Initialisation de la page Tab2');
-    
-    // Recharger les scores
-    console.log('Scores actuels avant rechargement :', this.triviaService.getScores());
-  
-    // Recharger les questions
+    this.route.queryParams.subscribe((params) => {
+      if (params['categoryId']) {
+        this.categoryId = +params['categoryId'];
+        this.loadQuestions();
+      }
+    });
+  }
+
+  ionViewWillEnter(): void {
+    console.log('Retour sur Tab2. Rechargement des données.');
     const cachedQuestions = this.triviaService.getCachedQuestions();
     if (cachedQuestions.length > 0 && this.triviaService.getCachedCategoryId() === this.categoryId) {
-      console.log('Questions récupérées depuis le cache.');
       this.questions = cachedQuestions;
       this.isLoading = false;
     } else {
-      console.log('Cache vide ou catégorie différente. Chargement des questions depuis l\'API.');
       this.loadQuestions();
     }
-  
-    console.log('Scores après rechargement :', this.triviaService.getScores());
+    console.log('Scores actuels :', this.triviaService.getScores());
   }
-  
-  
 
   loadQuestions(): void {
-    const cachedQuestions = this.triviaService.getCachedQuestions();
-
-    if (cachedQuestions.length > 0 && this.triviaService.getCachedCategoryId() === this.categoryId) {
-      this.questions = cachedQuestions;
-      this.isLoading = false;
-    } else {
-      this.triviaService.getQuestions(10, this.categoryId).subscribe({
-        next: (data: { results: any[] }) => {
-          this.questions = data.results.map((q) => ({
-            question: decode(q.question),
-            correctAnswer: decode(q.correct_answer),
-            allAnswers: this.shuffleAnswers([
-              decode(q.correct_answer),
-              ...q.incorrect_answers.map((ans: string) => decode(ans)),
-            ]),
-            completed: false,
-          }));
-          this.triviaService.setCachedQuestions(this.questions);
-          this.triviaService.setCachedCategoryId(this.categoryId);
-          this.isLoading = false;
-        },
-        error: (err: any) => {
-          console.error('Erreur lors du chargement des questions', err);
-          this.isLoading = false;
-        },
-      });
-    }
+    this.triviaService.getQuestions(10, this.categoryId).subscribe({
+      next: (data: { results: any[] }) => {
+        this.questions = data.results.map((q) => ({
+          question: decode(q.question),
+          correctAnswer: decode(q.correct_answer),
+          allAnswers: this.shuffleAnswers([
+            decode(q.correct_answer),
+            ...q.incorrect_answers.map((ans: string) => decode(ans)),
+          ]),
+          completed: false,
+        }));
+        this.triviaService.setCachedQuestions(this.questions);
+        this.triviaService.setCachedCategoryId(this.categoryId);
+        this.isLoading = false;
+      },
+      error: (err) => {
+        console.error('Erreur lors du chargement des questions', err);
+        this.isLoading = false;
+      },
+    });
   }
 
   selectAnswer(question: any, selectedAnswer: string): void {
     if (!question.completed) {
       question.completed = true;
       question.selectedAnswer = selectedAnswer;
-  
+
       console.log('Réponse sélectionnée :', selectedAnswer);
       console.log('Réponse correcte :', question.correctAnswer);
-  
+
       const isCorrect =
         decode(selectedAnswer).trim().toLowerCase() === decode(question.correctAnswer).trim().toLowerCase();
       this.triviaService.incrementScores(isCorrect);
-  
+
       console.log('Mise à jour des scores effectuée :', this.triviaService.getScores());
-  
+
       clearTimeout(this.showNextQuestionTimeout);
       this.showNextQuestionTimeout = setTimeout(() => {
         this.goToNextQuestion();
       }, 1500);
     }
-  }  
+  }
 
   goToNextQuestion(): void {
     if (this.currentQuestionIndex < this.questions.length - 1) {
