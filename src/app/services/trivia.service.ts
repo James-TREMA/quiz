@@ -101,7 +101,6 @@ export class TriviaService {
   }
 
   setCachedQuestions(questions: any[]): void {
-    // Sauvegarder toutes les questions avec leurs réponses mélangées
     const questionsToCache = questions.map((q) => ({
         ...q,
         allAnswers: q.allAnswers || this.shuffleAnswers([
@@ -110,9 +109,8 @@ export class TriviaService {
         ]),
     }));
     this.cachedQuestions = questionsToCache;
-    localStorage.setItem('cachedQuestions', JSON.stringify(questionsToCache)); // Stockage local
+    localStorage.setItem('cachedQuestions', JSON.stringify(questionsToCache));
   }
-
 
   getCachedCategoryId(): number | null {
     return this.cachedCategoryId;

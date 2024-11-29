@@ -74,8 +74,9 @@ export class Tab2Page implements OnInit {
   }
 
   shuffleAnswers(answers: string[]): string[] {
-    return answers.sort(() => Math.random() - 0.5);
+    return [...answers].sort(() => Math.random() - 0.5);
   }
+
 
   // Fonction pour afficher une notification
   async presentToast(message: string, duration: number = 3000) {
@@ -111,7 +112,7 @@ export class Tab2Page implements OnInit {
 
   loadQuestions(): void {
     this.isLoading = true;
-  
+
     this.triviaService
       .getQuestionsWithDelay(10, this.categoryId)
       .then((observable) => {
