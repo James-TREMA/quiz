@@ -65,52 +65,59 @@ export class Tab2Page implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    console.log('Initialisation de la page Tab2');
+    console.log('>>> [Tab2Page] Initialisation de la page Tab2');
     this.route.queryParams.subscribe((params) => {
+      console.log('>>> [Tab2Page] Paramètres de la route reçus :', params);
       if (params['categoryId']) {
         this.categoryId = +params['categoryId'];
+        console.log('>>> [Tab2Page] Catégorie sélectionnée :', this.categoryId);
         this.loadQuestions();
+      } else {
+        console.warn('>>> [Tab2Page] Aucun ID de catégorie fourni dans les paramètres.');
       }
     });
   }
 
-  shuffleAnswers(answers: string[]): string[] {
-    return [...answers].sort(() => Math.random() - 0.5);
-  }
-
-  async presentToast(message: string, duration: number = 3000): Promise<void> {
-    const toast = await this.toastController.create({
-      message,
-      duration,
-      position: 'top',
-    });
-    await toast.present();
-  }
-
   ionViewWillEnter(): void {
-    console.log('Retour sur Tab2. Rechargement des données.');
+    console.log('>>> [Tab2Page] Retour sur Tab2. Tentative de restauration des données.');
 
-    this.triviaService.restoreCache();
+    try {
+      this.triviaService.restoreCache();
+      const cachedQuestions = this.triviaService.getCachedQuestions();
+      const cachedCategoryId = this.triviaService.getCachedCategoryId();
 
-    const cachedQuestions = this.triviaService.getCachedQuestions();
-    if (
-      cachedQuestions.length > 0 &&
-      this.triviaService.getCachedCategoryId() === this.categoryId
-    ) {
-      this.questions = cachedQuestions.map((q) => ({
-        ...q,
-        selectedAnswer: q.selectedAnswer || null,
-        completed: q.completed || false,
-      }));
-      console.log('Questions restaurées :', this.questions);
-      this.isLoading = false;
-    } else {
-      this.loadQuestions();
+      console.log('>>> [Tab2Page] Questions restaurées depuis le cache :', cachedQuestions);
+      console.log('>>> [Tab2Page] ID de catégorie en cache :', cachedCategoryId);
+
+      if (
+        cachedQuestions.length > 0 &&
+        cachedCategoryId === this.categoryId
+      ) {
+        console.log('>>> [Tab2Page] Les questions mises en cache correspondent à la catégorie actuelle.');
+        this.questions = cachedQuestions.map((q) => ({
+          ...q,
+          selectedAnswer: q.selectedAnswer || null,
+          completed: q.completed || false,
+        }));
+        console.log('>>> [Tab2Page] Questions après restauration :', this.questions);
+        this.isLoading = false;
+      } else {
+        console.log('>>> [Tab2Page] Les questions mises en cache ne correspondent pas. Rechargement...');
+        this.loadQuestions();
+      }
+    } catch (error) {
+      console.error('>>> [Tab2Page] Erreur lors de la tentative de restauration du cache :', error);
+      this.loadQuestions(); // Fallback pour éviter un blocage
     }
   }
 
   loadQuestions(): void {
-    if (this.isFetchingQuestions) return; // Empêche les appels multiples
+    if (this.isFetchingQuestions) {
+      console.warn('>>> [Tab2Page] Appel multiple à loadQuestions évité.');
+      return;
+    }
+
+    console.log('>>> [Tab2Page] Début du chargement des questions pour la catégorie :', this.categoryId);
     this.isFetchingQuestions = true;
     this.isLoading = true;
 
@@ -119,7 +126,7 @@ export class Tab2Page implements OnInit {
       .then((observable) => {
         observable.subscribe({
           next: (data: { results: any[] }) => {
-            console.log('Données reçues de l\'API :', data);
+            console.log('>>> [Tab2Page] Données reçues de l\'API Trivia :', data);
 
             if (data && Array.isArray(data.results) && data.results.length > 0) {
               this.questions = data.results.map((q) => ({
@@ -133,12 +140,12 @@ export class Tab2Page implements OnInit {
                 ]),
                 completed: false,
               }));
-              console.log('Questions générées avec allAnswers :', this.questions);
+              console.log('>>> [Tab2Page] Questions formatées avec les réponses :', this.questions);
 
               this.triviaService.setCachedQuestions(this.questions);
               this.triviaService.setCachedCategoryId(this.categoryId);
             } else {
-              console.warn('Aucune question valide retournée par l\'API.');
+              console.warn('>>> [Tab2Page] Aucune question valide reçue.');
               this.presentToast(
                 'Aucune question disponible pour cette catégorie. Veuillez réessayer plus tard.'
               );
@@ -147,7 +154,7 @@ export class Tab2Page implements OnInit {
             this.isFetchingQuestions = false;
           },
           error: (err) => {
-            console.error('Erreur lors du chargement des questions :', err);
+            console.error('>>> [Tab2Page] Erreur lors de la réception des données de l\'API :', err);
             this.isLoading = false;
             this.isFetchingQuestions = false;
             if (err.message.includes('429')) {
@@ -161,7 +168,7 @@ export class Tab2Page implements OnInit {
         });
       })
       .catch((err) => {
-        console.error('Erreur lors de la configuration de la requête :', err);
+        console.error('>>> [Tab2Page] Erreur lors de la configuration de la requête Trivia :', err);
         this.isLoading = false;
         this.isFetchingQuestions = false;
         this.presentToast(
@@ -170,20 +177,35 @@ export class Tab2Page implements OnInit {
       });
   }
 
+  shuffleAnswers(answers: string[]): string[] {
+    console.log('>>> [Tab2Page] Mélange des réponses :', answers);
+    return [...answers].sort(() => Math.random() - 0.5);
+  }
+
+  async presentToast(message: string, duration: number = 3000): Promise<void> {
+    console.log('>>> [Tab2Page] Affichage d\'un toast avec le message :', message);
+    const toast = await this.toastController.create({
+      message,
+      duration,
+      position: 'top',
+    });
+    await toast.present();
+  }
+
   selectAnswer(question: any, selectedAnswer: string): void {
     if (!question.completed) {
       question.completed = true;
       question.selectedAnswer = selectedAnswer;
 
-      console.log('Réponse sélectionnée :', selectedAnswer);
-      console.log('Réponse correcte :', question.correctAnswer);
+      console.log('>>> [Tab2Page] Réponse sélectionnée :', selectedAnswer);
+      console.log('>>> [Tab2Page] Réponse correcte :', question.correctAnswer);
 
       const isCorrect =
         decode(selectedAnswer).trim().toLowerCase() ===
         decode(question.correctAnswer).trim().toLowerCase();
       this.triviaService.incrementScores(isCorrect);
 
-      console.log('Mise à jour des scores effectuée :', this.triviaService.getScores());
+      console.log('>>> [Tab2Page] Mise à jour des scores après sélection :', this.triviaService.getScores());
 
       clearTimeout(this.showNextQuestionTimeout);
       this.showNextQuestionTimeout = setTimeout(() => {
@@ -195,8 +217,9 @@ export class Tab2Page implements OnInit {
   goToNextQuestion(): void {
     if (this.currentQuestionIndex < this.questions.length - 1) {
       this.currentQuestionIndex++;
+      console.log('>>> [Tab2Page] Passage à la question suivante. Index actuel :', this.currentQuestionIndex);
     } else {
-      console.log('Quiz terminé');
+      console.log('>>> [Tab2Page] Quiz terminé.');
       this.presentToast('Quiz terminé');
     }
   }
