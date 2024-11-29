@@ -89,28 +89,32 @@ export class Tab2Page implements OnInit {
 
   ionViewWillEnter(): void {
     console.log('Retour sur Tab2. Rechargement des données.');
-    
+
     this.triviaService.restoreCache();
-    
+
     const cachedQuestions = this.triviaService.getCachedQuestions();
     if (
-      cachedQuestions.length > 0 &&
-      this.triviaService.getCachedCategoryId() === this.categoryId
+        cachedQuestions.length > 0 &&
+        this.triviaService.getCachedCategoryId() === this.categoryId
     ) {
-      // Compléter les réponses manquantes
-      this.questions = cachedQuestions.map((q) => ({
-        ...q,
-        allAnswers: q.allAnswers?.length ? q.allAnswers : this.shuffleAnswers([
-          q.correctAnswer,
-          ...(q.incorrect_answers || []),
-        ]),
-      }));
-      console.log('Questions restaurées avec allAnswers régénérées :', this.questions);
-      this.isLoading = false;
+        this.questions = cachedQuestions.map((q) => ({
+            ...q,
+            allAnswers: q.allAnswers?.length
+                ? q.allAnswers
+                : this.shuffleAnswers([
+                      q.correctAnswer,
+                      ...(q.incorrect_answers || []),
+                  ]),
+            selectedAnswer: q.selectedAnswer || null,
+            completed: q.completed || false,
+        }));
+        console.log('Questions restaurées :', this.questions);
+        this.isLoading = false;
     } else {
-      this.loadQuestions();
+        this.loadQuestions();
     }
   }
+
   
   
   loadQuestions(): void {
