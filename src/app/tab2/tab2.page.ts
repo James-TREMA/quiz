@@ -55,12 +55,13 @@ export class Tab2Page implements OnInit {
   isLoading = true;
   categoryId!: number;
   currentQuestionIndex = 0;
+  private isFetchingQuestions = false;
   showNextQuestionTimeout: any;
 
   constructor(
     private triviaService: TriviaService,
     private route: ActivatedRoute,
-    private toastController: ToastController // Injection correcte ici
+    private toastController: ToastController
   ) {}
 
   ngOnInit(): void {
@@ -77,13 +78,11 @@ export class Tab2Page implements OnInit {
     return [...answers].sort(() => Math.random() - 0.5);
   }
 
-
-  // Fonction pour afficher une notification
-  async presentToast(message: string, duration: number = 3000) {
+  async presentToast(message: string, duration: number = 3000): Promise<void> {
     const toast = await this.toastController.create({
       message,
       duration,
-      position: 'top', // Pour afficher en bas on utilise bottom mais on l'affiche en haut donc top
+      position: 'top',
     });
     await toast.present();
   }
@@ -95,22 +94,24 @@ export class Tab2Page implements OnInit {
 
     const cachedQuestions = this.triviaService.getCachedQuestions();
     if (
-        cachedQuestions.length > 0 &&
-        this.triviaService.getCachedCategoryId() === this.categoryId
+      cachedQuestions.length > 0 &&
+      this.triviaService.getCachedCategoryId() === this.categoryId
     ) {
-        this.questions = cachedQuestions.map((q) => ({
-            ...q,
-            selectedAnswer: q.selectedAnswer || null,
-            completed: q.completed || false,
-        }));
-        console.log('Questions restaurées :', this.questions);
-        this.isLoading = false;
+      this.questions = cachedQuestions.map((q) => ({
+        ...q,
+        selectedAnswer: q.selectedAnswer || null,
+        completed: q.completed || false,
+      }));
+      console.log('Questions restaurées :', this.questions);
+      this.isLoading = false;
     } else {
-        this.loadQuestions();
+      this.loadQuestions();
     }
   }
 
   loadQuestions(): void {
+    if (this.isFetchingQuestions) return; // Empêche les appels multiples
+    this.isFetchingQuestions = true;
     this.isLoading = true;
 
     this.triviaService
@@ -119,6 +120,7 @@ export class Tab2Page implements OnInit {
         observable.subscribe({
           next: (data: { results: any[] }) => {
             console.log('Données reçues de l\'API :', data);
+
             if (data && Array.isArray(data.results) && data.results.length > 0) {
               this.questions = data.results.map((q) => ({
                 question: decode(q.question || ''),
@@ -132,6 +134,7 @@ export class Tab2Page implements OnInit {
                 completed: false,
               }));
               console.log('Questions générées avec allAnswers :', this.questions);
+
               this.triviaService.setCachedQuestions(this.questions);
               this.triviaService.setCachedCategoryId(this.categoryId);
             } else {
@@ -141,10 +144,12 @@ export class Tab2Page implements OnInit {
               );
             }
             this.isLoading = false;
+            this.isFetchingQuestions = false;
           },
           error: (err) => {
             console.error('Erreur lors du chargement des questions :', err);
             this.isLoading = false;
+            this.isFetchingQuestions = false;
             if (err.message.includes('429')) {
               this.presentToast(
                 'Vous avez atteint la limite de requêtes. Veuillez patienter et réessayer.'
@@ -158,12 +163,13 @@ export class Tab2Page implements OnInit {
       .catch((err) => {
         console.error('Erreur lors de la configuration de la requête :', err);
         this.isLoading = false;
+        this.isFetchingQuestions = false;
         this.presentToast(
           'Impossible de charger les questions. Veuillez réessayer.'
         );
       });
   }
-  
+
   selectAnswer(question: any, selectedAnswer: string): void {
     if (!question.completed) {
       question.completed = true;
@@ -191,9 +197,7 @@ export class Tab2Page implements OnInit {
       this.currentQuestionIndex++;
     } else {
       console.log('Quiz terminé');
-      this.presentToast(
-        'Quiz terminé'
-      );
+      this.presentToast('Quiz terminé');
     }
   }
 }
