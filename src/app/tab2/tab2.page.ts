@@ -99,12 +99,6 @@ export class Tab2Page implements OnInit {
     ) {
         this.questions = cachedQuestions.map((q) => ({
             ...q,
-            allAnswers: q.allAnswers?.length
-                ? q.allAnswers
-                : this.shuffleAnswers([
-                      q.correctAnswer,
-                      ...(q.incorrect_answers || []),
-                  ]),
             selectedAnswer: q.selectedAnswer || null,
             completed: q.completed || false,
         }));
@@ -115,8 +109,6 @@ export class Tab2Page implements OnInit {
     }
   }
 
-  
-  
   loadQuestions(): void {
     this.isLoading = true;
   

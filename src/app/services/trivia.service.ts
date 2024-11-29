@@ -26,6 +26,10 @@ export class TriviaService {
     await toast.present();
   }
 
+  shuffleAnswers(answers: string[]): string[] {
+    return [...answers].sort(() => Math.random() - 0.5);
+  }
+
   // Récupérer les catégories
   getCategories(): Observable<{ trivia_categories: { id: number; name: string }[] }> {
     const url = 'https://opentdb.com/api_category.php';
@@ -97,9 +101,18 @@ export class TriviaService {
   }
 
   setCachedQuestions(questions: any[]): void {
-    this.cachedQuestions = questions;
-    localStorage.setItem('cachedQuestions', JSON.stringify(questions)); // Stockage local
+    // Sauvegarder toutes les questions avec leurs réponses mélangées
+    const questionsToCache = questions.map((q) => ({
+        ...q,
+        allAnswers: q.allAnswers || this.shuffleAnswers([
+            q.correctAnswer,
+            ...(q.incorrect_answers || []),
+        ]),
+    }));
+    this.cachedQuestions = questionsToCache;
+    localStorage.setItem('cachedQuestions', JSON.stringify(questionsToCache)); // Stockage local
   }
+
 
   getCachedCategoryId(): number | null {
     return this.cachedCategoryId;
@@ -114,10 +127,16 @@ export class TriviaService {
     const savedQuestions = localStorage.getItem('cachedQuestions');
     const savedCategoryId = localStorage.getItem('cachedCategoryId');
     if (savedQuestions) {
-      this.cachedQuestions = JSON.parse(savedQuestions);
+        this.cachedQuestions = JSON.parse(savedQuestions).map((q: any) => ({
+            ...q,
+            allAnswers: q.allAnswers || this.shuffleAnswers([
+                q.correctAnswer,
+                ...(q.incorrect_answers || []),
+            ]),
+        }));
     }
     if (savedCategoryId) {
-      this.cachedCategoryId = JSON.parse(savedCategoryId);
+        this.cachedCategoryId = JSON.parse(savedCategoryId);
     }
   }
 
